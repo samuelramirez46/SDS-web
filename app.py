@@ -317,6 +317,12 @@ else:
     if output_key not in st.session_state:
         st.session_state[output_key] = ""
 
+    # Streamlit ejecuta este callback antes de volver a crear los widgets.
+    # Así se pueden limpiar sus valores sin modificar claves después de instanciarlos.
+    def limpiar_campos(clave_entrada, clave_salida):
+        st.session_state[clave_entrada] = ""
+        st.session_state[clave_salida] = ""
+
     st.markdown("**MENSAJE DE ENTRADA**")
     st.text_area(
         "Mensaje de entrada",
@@ -332,12 +338,12 @@ else:
     with col_descifrar:
         descifrar = st.button("🔓  DESCIFRAR", use_container_width=True)
     with col_borrar:
-        borrar = st.button("✕  BORRAR", use_container_width=True)
-
-    if borrar:
-        st.session_state[input_key] = ""
-        st.session_state[output_key] = ""
-        st.rerun()
+        st.button(
+            "✕  BORRAR",
+            use_container_width=True,
+            on_click=limpiar_campos,
+            args=(input_key, output_key),
+        )
 
     if cifrar or descifrar:
         texto = st.session_state[input_key]
